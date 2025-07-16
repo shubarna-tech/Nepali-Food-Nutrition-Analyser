@@ -1,0 +1,92 @@
+{% extends 'myapp/base.html' %} {% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div
+  class="min-h-[70vh] bg-gradient-to-br from-green-50 via-emerald-100 to-green-200 py-10 px-2 md:px-0"
+>
+  <div class="max-w-3xl mx-auto flex flex-col gap-8">
+    <!-- Admin Profile Card -->
+    <div
+      class="bg-white/90 rounded-3xl shadow-2xl p-8 flex flex-col md:flex-row items-center gap-6 mb-2 animate-fade-in"
+    >
+      <div
+        class="flex-shrink-0 flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-green-200 to-emerald-300 shadow-lg text-5xl font-bold text-green-700"
+      >
+        <span>A</span>
+      </div>
+      <div class="flex-1 flex flex-col items-center md:items-start">
+        <h2 class="text-3xl font-extrabold text-green-700 mb-1">Admin</h2>
+        <p class="text-gray-600 text-lg mb-1 flex items-center">
+          <svg
+            class="h-5 w-5 text-green-400 mr-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 12A4 4 0 118 12a4 4 0 018 0z"
+            /></svg
+          >{{ user.email }}
+        </p>
+        <span
+          class="mt-2 px-5 py-2 bg-green-600 text-white font-bold rounded-lg shadow"
+          >Superuser</span
+        >
+      </div>
+    </div>
+    <!-- Admin Links Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <a
+        href="/admin/"
+        class="bg-gradient-to-br from-green-100 to-green-300 rounded-2xl shadow-lg p-8 flex flex-col items-center hover:scale-105 transition"
+      >
+        <svg
+          class="h-10 w-10 text-green-600 mb-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 7v4a1 1 0 001 1h3m10-5h3a1 1 0 011 1v4a1 1 0 01-1 1h-3m-10 4h10m-6 4h2"
+          />
+        </svg>
+        <span class="text-xl font-bold text-green-700 mb-1"
+          >Django Admin Panel</span
+        >
+        <span class="text-gray-600 text-center"
+          >Manage users, data, and site settings</span
+        >
+      </a>
+      <a
+        href="{% url 'admin-analytics-dashboard' %}"
+        class="bg-gradient-to-br from-emerald-100 to-green-200 rounded-2xl shadow-lg p-8 flex flex-col items-center hover:scale-105 transition"
+      >
+        <svg
+          class="h-10 w-10 text-emerald-600 mb-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M11 17a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-6a2 2 0 00-2 2v10zm-6 4a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2h2z"
+          />
+        </svg>
+        <span class="text-xl font-bold text-emerald-700 mb-1"
+          >Analytics Dashboard</span
+        >
+        <span class="text-gray-600 text-center"
+          >View app analytics and reports</span
+        >
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

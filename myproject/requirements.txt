@@ -1,0 +1,8 @@
+# File: requirements.txt
+Django>=4.2
+djangorestframework
+PyJWT
+tensorflowjs
+opencv-python  # for webcam fallback
+pillow         # image utilities
+torch          # if you ever do server-side PyTorch inference

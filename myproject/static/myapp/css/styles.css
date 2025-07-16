@@ -1,0 +1,91 @@
+/* File: static/myapp/css/styles.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.card {
+  @apply bg-white rounded-2xl shadow p-6 flex flex-col items-center hover:shadow-lg transition;
+}
+
+#webcam {
+  @apply border-4 border-green-200 rounded-lg;
+}
+
+body {
+  @apply p-4;
+}
+
+.form-input {
+  background-color: #e6f9ed;
+  border: 2px solid #6ee7b7;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 1.125rem;
+  width: 100%;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.form-input:focus {
+  border-color: #059669;
+  box-shadow: 0 0 0 2px #6ee7b7;
+  background-color: #d1fae5;
+}
+
+.toggle-btn {
+  @apply px-3 py-1 rounded-lg font-semibold text-green-700 bg-green-100 hover:bg-green-200 transition;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  margin-left: 0.25rem;
+}
+.toggle-btn.active {
+  @apply bg-green-600 text-white;
+}
+
+.scan-flex-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.scan-camera-section,
+.scan-result-section {
+  flex: 1 1 300px;
+  min-width: 280px;
+}
+
+#analytics-filters {
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+#analytics-filters .form-input {
+  min-width: 150px;
+}
+#analytics-filters button {
+  min-width: 140px;
+}
+#analytics-cards .card {
+  min-width: 180px;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .scan-flex-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  #analytics-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #analytics-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}

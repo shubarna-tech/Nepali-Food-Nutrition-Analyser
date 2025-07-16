@@ -1,0 +1,12 @@
+<!-- File: templates/registration/logged_out.html -->
+{% extends 'myapp/home.html' %} {% block content %}
+<script type="text/javascript">
+  window.location.href = '{% url 'home' %}';
+</script>
+<noscript>
+  <div class="max-w-md mx-auto p-6 bg-white rounded shadow text-center">
+    <p class="mb-4">You have been logged out.</p>
+    <a href="{% url 'home' %}" class="text-green-600 underline">Go to Home</a>
+  </div>
+</noscript>
+{% endblock %}
