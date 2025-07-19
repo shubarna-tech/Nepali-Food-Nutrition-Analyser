@@ -1,8 +1,9 @@
 # File: myapp/urls.py
+from django.contrib.auth.views import LogoutView
 from django.urls import path
+
 from . import views
 from .api_views import logs_list, track
-from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path("", views.home, name="home"),

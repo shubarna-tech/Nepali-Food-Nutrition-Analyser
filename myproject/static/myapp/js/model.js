@@ -1,3 +1,6 @@
+// MUST be loaded as a regular script, tf is global
+// No import statements needed
+
 window.loadClassifierModel = async function () {
   console.log(
     "\u25b6\ufe0f Loading model from /static/myapp/models/classifier/model.json",

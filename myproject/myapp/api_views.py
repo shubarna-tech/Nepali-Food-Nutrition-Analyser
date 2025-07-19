@@ -1,15 +1,17 @@
 # myapp/api_views.py
+import datetime
+
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
+from django.db.models import Count
+from django.http import JsonResponse
+from django.utils.dateparse import parse_date
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 from .models import Nutrition
 from .serializers import NutritionSerializer
-from django.contrib.auth.decorators import user_passes_test
-from django.utils.dateparse import parse_date
-from django.http import JsonResponse
-from django.db.models import Count
-import datetime
-from django.contrib.auth.models import User
 
 # Full nutrition table for all foods
 FOOD_NUTRITION = {

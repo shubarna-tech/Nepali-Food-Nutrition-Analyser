@@ -1,355 +1,231 @@
-{% extends 'myapp/base.html' %} {% load static %} {% block title %}Dashboard{%
-endblock %} {% block content %}
-<div
-  class="min-h-[70vh] bg-gradient-to-br from-green-50 via-emerald-100 to-green-200 py-10 px-2 md:px-0"
->
-  <div class="max-w-4xl mx-auto flex flex-col gap-8">
-    <!-- Profile Card -->
-    <div
-      class="bg-white/90 rounded-3xl shadow-2xl p-8 flex flex-col md:flex-row items-center gap-6 mb-2 animate-fade-in"
-    >
-      <div
-        class="flex-shrink-0 flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-green-200 to-emerald-300 shadow-lg text-5xl font-bold text-green-700"
-      >
-        <span
-          >{% if user.first_name %}{{ user.first_name|first }}{% else %}{{
-          user.username|first }}{% endif %}</span
-        >
-      </div>
-      <div class="flex-1 flex flex-col items-center md:items-start">
-        <h2 class="text-3xl font-extrabold text-green-700 mb-1">
-          {{ user.get_full_name|default:user.username }}
-        </h2>
-        <p class="text-gray-600 text-lg mb-1 flex items-center">
-          <svg
-            class="h-5 w-5 text-green-400 mr-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M16 12A4 4 0 118 12a4 4 0 018 0z"
-            /></svg
-          >{{ user.email }}
-        </p>
-        <a
-          href="{% url 'user_goal_update' %}"
-          class="mt-2 px-5 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow transition"
-          >Edit Profile/Goals</a
-        >
-      </div>
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <div class="min-h-[70vh] bg-gradient-to-br from-green-50 via-emerald-100 to-green-200 py-10 px-2 md:px-0">
+        <div class="max-w-4xl mx-auto flex flex-col gap-8">
+            <!-- Profile Card -->
+            <div class="bg-white/90 rounded-3xl shadow-2xl p-8 flex flex-col md:flex-row items-center gap-6 mb-2 animate-fade-in">
+                <div class="flex-shrink-0 flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-green-200 to-emerald-300 shadow-lg text-5xl font-bold text-green-700">
+                    <span>
+                        {% if user.first_name %}
+                            {{ user.first_name|first }}
+                        {% else %}
+                            {{ user.username|first }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="flex-1 flex flex-col items-center md:items-start">
+                    <h2 class="text-3xl font-extrabold text-green-700 mb-1">{{ user.get_full_name|default:user.username }}</h2>
+                    <p class="text-gray-600 text-lg mb-1 flex items-center">
+                        <svg class="h-5 w-5 text-green-400 mr-1"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12A4 4 0 118 12a4 4 0 018 0z" />
+                        </svg>
+                        {{ user.email }}
+                    </p>
+                </div>
+            </div>
+            <!-- Stats and Goals Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Today's Nutrition Stat Card -->
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-lg p-6 flex flex-col items-center animate-fade-in">
+                    <div class="flex items-center mb-4">
+                        <svg class="h-7 w-7 text-yellow-500 mr-2"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                        <h3 class="text-lg font-bold text-yellow-700">Today's Nutrition</h3>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 w-full">
+                        <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+                            <span class="text-3xl font-extrabold text-green-600">{{ total_calories|floatformat:0 }}</span>
+                            <span class="text-xs text-gray-500">Calories</span>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+                            <span class="text-2xl font-bold text-blue-600">{{ total_protein|default:'--' }}</span>
+                            <span class="text-xs text-gray-500">Protein (g)</span>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+                            <span class="text-2xl font-bold text-pink-600">{{ total_fat|default:'--' }}</span>
+                            <span class="text-xs text-gray-500">Fat (g)</span>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+                            <span class="text-2xl font-bold text-yellow-600">{{ total_carbs|default:'--' }}</span>
+                            <span class="text-xs text-gray-500">Carbs (g)</span>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center col-span-2">
+                            <span class="text-2xl font-bold text-purple-600">{{ total_fiber|default:'--' }}</span>
+                            <span class="text-xs text-gray-500">Fiber (g)</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Goal Progress Card -->
+                <div class="bg-gradient-to-br from-emerald-50 to-green-100 rounded-2xl shadow-lg p-6 flex flex-col animate-fade-in">
+                    <div class="flex items-center mb-4">
+                        <svg class="h-7 w-7 text-green-500 mr-2"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                        <h3 class="text-lg font-bold text-green-700">Your Goal Progress</h3>
+                    </div>
+                    {% if user_goal %}
+                        <ul class="space-y-3">
+                            <li>
+                                <span class="font-semibold">Calories:</span>
+                                <div class="w-full bg-gray-200 rounded h-3 mb-1">
+                                    <div class="bg-green-500 h-3 rounded"
+                                         style="width: {{ goal_percent.calories }}%;
+                                                max-width:100%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">{{ goal_progress.calories.0|floatformat:0 }} / {{ goal_progress.calories.1 }} kcal</span>
+                            </li>
+                            <li>
+                                <span class="font-semibold">Protein:</span>
+                                <div class="w-full bg-gray-200 rounded h-3 mb-1">
+                                    <div class="bg-blue-500 h-3 rounded"
+                                         style="width: {{ goal_percent.protein }}%;
+                                                max-width:100%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">{{ goal_progress.protein.0|floatformat:0 }} / {{ goal_progress.protein.1 }} g</span>
+                            </li>
+                            <li>
+                                <span class="font-semibold">Carbs:</span>
+                                <div class="w-full bg-gray-200 rounded h-3 mb-1">
+                                    <div class="bg-yellow-400 h-3 rounded"
+                                         style="width: {{ goal_percent.carbs }}%;
+                                                max-width:100%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">{{ goal_progress.carbs.0|floatformat:0 }} / {{ goal_progress.carbs.1 }} g</span>
+                            </li>
+                            <li>
+                                <span class="font-semibold">Fat:</span>
+                                <div class="w-full bg-gray-200 rounded h-3 mb-1">
+                                    <div class="bg-pink-500 h-3 rounded"
+                                         style="width: {{ goal_percent.fat }}%;
+                                                max-width:100%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">{{ goal_progress.fat.0|floatformat:0 }} / {{ goal_progress.fat.1 }} g</span>
+                            </li>
+                            <li>
+                                <span class="font-semibold">Fiber:</span>
+                                <div class="w-full bg-gray-200 rounded h-3 mb-1">
+                                    <div class="bg-purple-500 h-3 rounded"
+                                         style="width: {{ goal_percent.fiber }}%;
+                                                max-width:100%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">{{ goal_progress.fiber.0|floatformat:0 }} / {{ goal_progress.fiber.1 }} g</span>
+                            </li>
+                            <li>
+                                <span class="font-semibold">Water:</span>
+                                <div class="w-full bg-gray-200 rounded h-3 mb-1">
+                                    <div class="bg-cyan-500 h-3 rounded"
+                                         style="width: {{ goal_percent.water }}%;
+                                                max-width:100%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">{{ goal_progress.water.0|floatformat:0 }} / {{ goal_progress.water.1 }} ml</span>
+                            </li>
+                        </ul>
+                    {% else %}
+                        <div class="text-gray-500">Set your goals to start tracking progress!</div>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Chart and Recent Meals Section -->
+            <div class="grid grid-cols-1 gap-8">
+                <!-- Calorie Chart Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col animate-fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6 text-green-500 mr-2"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6" />
+                            </svg>
+                            <h4 class="text-lg font-semibold text-green-700">Calorie Intake</h4>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="toggle-btn" id="daily-btn">Daily</button>
+                            <button class="toggle-btn" id="weekly-btn">Weekly</button>
+                            <button class="toggle-btn" id="monthly-btn">Monthly</button>
+                        </div>
+                    </div>
+                    <canvas id="calorieChart" height="120"></canvas>
+                </div>
+                <!-- Recent Meals Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col animate-fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6 text-blue-500 mr-2"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                            <h4 class="text-lg font-semibold text-blue-700">Recent Meals</h4>
+                        </div>
+                    </div>
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-green-700 text-base font-bold uppercase bg-green-50">
+                                <th class="py-3">S.N</th>
+                                <th class="py-3">Food</th>
+                                <th class="py-3">Calories</th>
+                                <th class="py-3">Protein (g)</th>
+                                <th class="py-3">Fat (g)</th>
+                                <th class="py-3">Carbs (g)</th>
+                                <th class="py-3">Fiber (g)</th>
+                                <th class="py-3">Date</th>
+                                <th class="py-3">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in nutritions|slice:':5' %}
+                                <tr class="border-b last:border-b-0">
+                                    <td class="py-2 text-gray-400">{{ forloop.counter }}</td>
+                                    <td class="py-2 font-medium">{{ item.food_class }}</td>
+                                    <td class="py-2">{{ item.calories|floatformat:0 }}</td>
+                                    <td class="py-2">{{ item.protein|default:'--' }}</td>
+                                    <td class="py-2">{{ item.fat|default:'--' }}</td>
+                                    <td class="py-2">{{ item.carbs|default:'--' }}</td>
+                                    <td class="py-2">{{ item.fiber|default:'--' }}</td>
+                                    <td class="py-2 text-gray-500">{{ item.timestamp|date:"M d, Y" }}</td>
+                                    <td class="py-2 text-gray-500">{{ item.timestamp|date:"H:i" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="9" class="py-4 text-center text-gray-400">No meals logged yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- Stats and Goals Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Today's Nutrition Stat Card -->
-      <div
-        class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-lg p-6 flex flex-col items-center animate-fade-in"
-      >
-        <div class="flex items-center mb-4">
-          <svg
-            class="h-7 w-7 text-yellow-500 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-            />
-          </svg>
-          <h3 class="text-lg font-bold text-yellow-700">Today's Nutrition</h3>
-        </div>
-        <div class="grid grid-cols-2 gap-4 w-full">
-          <div
-            class="bg-white rounded-xl shadow p-4 flex flex-col items-center"
-          >
-            <span class="text-3xl font-extrabold text-green-600"
-              >{{ total_calories|floatformat:0 }}</span
-            >
-            <span class="text-xs text-gray-500">Calories</span>
-          </div>
-          <div
-            class="bg-white rounded-xl shadow p-4 flex flex-col items-center"
-          >
-            <span class="text-2xl font-bold text-blue-600"
-              >{{ total_protein|default:'--' }}</span
-            >
-            <span class="text-xs text-gray-500">Protein (g)</span>
-          </div>
-          <div
-            class="bg-white rounded-xl shadow p-4 flex flex-col items-center"
-          >
-            <span class="text-2xl font-bold text-pink-600"
-              >{{ total_fat|default:'--' }}</span
-            >
-            <span class="text-xs text-gray-500">Fat (g)</span>
-          </div>
-          <div
-            class="bg-white rounded-xl shadow p-4 flex flex-col items-center"
-          >
-            <span class="text-2xl font-bold text-yellow-600"
-              >{{ total_carbs|default:'--' }}</span
-            >
-            <span class="text-xs text-gray-500">Carbs (g)</span>
-          </div>
-          <div
-            class="bg-white rounded-xl shadow p-4 flex flex-col items-center col-span-2"
-          >
-            <span class="text-2xl font-bold text-purple-600"
-              >{{ total_fiber|default:'--' }}</span
-            >
-            <span class="text-xs text-gray-500">Fiber (g)</span>
-          </div>
-        </div>
-      </div>
-      <!-- Goal Progress Card -->
-      <div
-        class="bg-gradient-to-br from-emerald-50 to-green-100 rounded-2xl shadow-lg p-6 flex flex-col animate-fade-in"
-      >
-        <div class="flex items-center mb-4">
-          <svg
-            class="h-7 w-7 text-green-500 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-            />
-          </svg>
-          <h3 class="text-lg font-bold text-green-700">Your Goal Progress</h3>
-        </div>
-        {% if user_goal %}
-        <ul class="space-y-3">
-          <li>
-            <span class="font-semibold">Calories:</span>
-            <div class="w-full bg-gray-200 rounded h-3 mb-1">
-              <div
-                class="bg-green-500 h-3 rounded"
-                style="width: {{ goal_percent.calories }}%; max-width:100%"
-              ></div>
-            </div>
-            <span class="text-xs text-gray-600"
-              >{{ goal_progress.calories.0|floatformat:0 }} / {{
-              goal_progress.calories.1 }} kcal</span
-            >
-          </li>
-          <li>
-            <span class="font-semibold">Protein:</span>
-            <div class="w-full bg-gray-200 rounded h-3 mb-1">
-              <div
-                class="bg-blue-500 h-3 rounded"
-                style="width: {{ goal_percent.protein }}%; max-width:100%"
-              ></div>
-            </div>
-            <span class="text-xs text-gray-600"
-              >{{ goal_progress.protein.0|floatformat:0 }} / {{
-              goal_progress.protein.1 }} g</span
-            >
-          </li>
-          <li>
-            <span class="font-semibold">Carbs:</span>
-            <div class="w-full bg-gray-200 rounded h-3 mb-1">
-              <div
-                class="bg-yellow-400 h-3 rounded"
-                style="width: {{ goal_percent.carbs }}%; max-width:100%"
-              ></div>
-            </div>
-            <span class="text-xs text-gray-600"
-              >{{ goal_progress.carbs.0|floatformat:0 }} / {{
-              goal_progress.carbs.1 }} g</span
-            >
-          </li>
-          <li>
-            <span class="font-semibold">Fat:</span>
-            <div class="w-full bg-gray-200 rounded h-3 mb-1">
-              <div
-                class="bg-pink-500 h-3 rounded"
-                style="width: {{ goal_percent.fat }}%; max-width:100%"
-              ></div>
-            </div>
-            <span class="text-xs text-gray-600"
-              >{{ goal_progress.fat.0|floatformat:0 }} / {{ goal_progress.fat.1
-              }} g</span
-            >
-          </li>
-          <li>
-            <span class="font-semibold">Fiber:</span>
-            <div class="w-full bg-gray-200 rounded h-3 mb-1">
-              <div
-                class="bg-purple-500 h-3 rounded"
-                style="width: {{ goal_percent.fiber }}%; max-width:100%"
-              ></div>
-            </div>
-            <span class="text-xs text-gray-600"
-              >{{ goal_progress.fiber.0|floatformat:0 }} / {{
-              goal_progress.fiber.1 }} g</span
-            >
-          </li>
-          <li>
-            <span class="font-semibold">Water:</span>
-            <div class="w-full bg-gray-200 rounded h-3 mb-1">
-              <div
-                class="bg-cyan-500 h-3 rounded"
-                style="width: {{ goal_percent.water }}%; max-width:100%"
-              ></div>
-            </div>
-            <span class="text-xs text-gray-600"
-              >{{ goal_progress.water.0|floatformat:0 }} / {{
-              goal_progress.water.1 }} ml</span
-            >
-          </li>
-        </ul>
-        {% else %}
-        <div class="text-gray-500">
-          Set your goals to start tracking progress!
-        </div>
-        {% endif %}
-      </div>
-    </div>
-    <!-- Chart and Recent Meals Section -->
-    <div class="grid grid-cols-1 gap-8">
-      <!-- Calorie Chart Card -->
-      <div
-        class="bg-white rounded-2xl shadow-lg p-6 flex flex-col animate-fade-in"
-      >
-        <div class="flex justify-between items-center mb-4">
-          <div class="flex items-center">
-            <svg
-              class="h-6 w-6 text-green-500 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6"
-              />
-            </svg>
-            <h4 class="text-lg font-semibold text-green-700">Calorie Intake</h4>
-          </div>
-          <div class="flex gap-2">
-            <button class="toggle-btn" id="daily-btn">Daily</button>
-            <button class="toggle-btn" id="weekly-btn">Weekly</button>
-            <button class="toggle-btn" id="monthly-btn">Monthly</button>
-          </div>
-        </div>
-        <canvas id="calorieChart" height="120"></canvas>
-      </div>
-      <!-- Recent Meals Card -->
-      <div
-        class="bg-white rounded-2xl shadow-lg p-6 flex flex-col animate-fade-in"
-      >
-        <div class="flex justify-between items-center mb-4">
-          <div class="flex items-center">
-            <svg
-              class="h-6 w-6 text-blue-500 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-            <h4 class="text-lg font-semibold text-blue-700">Recent Meals</h4>
-          </div>
-        </div>
-        <table class="w-full text-left">
-          <thead>
-            <tr
-              class="text-green-700 text-base font-bold uppercase bg-green-50"
-            >
-              <th class="py-3">S.N</th>
-              <th class="py-3">Food</th>
-              <th class="py-3">Calories</th>
-              <th class="py-3">Protein (g)</th>
-              <th class="py-3">Fat (g)</th>
-              <th class="py-3">Carbs (g)</th>
-              <th class="py-3">Fiber (g)</th>
-              <th class="py-3">Date</th>
-              <th class="py-3">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in nutritions|slice:':5' %}
-            <tr class="border-b last:border-b-0">
-              <td class="py-2 text-gray-400">{{ forloop.counter }}</td>
-              <td class="py-2 font-medium">{{ item.food_class }}</td>
-              <td class="py-2">{{ item.calories|floatformat:0 }}</td>
-              <td class="py-2">{{ item.protein|default:'--' }}</td>
-              <td class="py-2">{{ item.fat|default:'--' }}</td>
-              <td class="py-2">{{ item.carbs|default:'--' }}</td>
-              <td class="py-2">{{ item.fiber|default:'--' }}</td>
-              <td class="py-2 text-gray-500">
-                {{ item.timestamp|date:"M d, Y" }}
-              </td>
-              <td class="py-2 text-gray-500">
-                {{ item.timestamp|date:"H:i" }}
-              </td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="9" class="py-4 text-center text-gray-400">
-                No meals logged yet.
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-<style>
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(24px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  .animate-fade-in {
-    animation: fade-in 1s cubic-bezier(0.4, 0, 0.2, 1) both;
-  }
-  @keyframes bounce {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-12px);
-    }
-  }
-  .animate-bounce {
-    animation: bounce 2s infinite;
-  }
-</style>
-{% endblock %} {% block extra_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  window.calorieDailyData = {{ daily_data|safe }};
-  window.calorieWeeklyData = {{ weekly_data|safe }};
-  window.calorieMonthlyData = {{ monthly_data|safe }};
-  window.calorieDailyLabels = {{ daily_labels|safe }};
-  window.calorieWeeklyLabels = {{ weekly_labels|safe }};
-  window.calorieMonthlyLabels = {{ monthly_labels|safe }};
-</script>
-<script src="{% static 'myapp/js/main.js' %}"></script>
+    <style>
+@keyframes fade-in { from { opacity: 0; transform: translateY(24px);} to { opacity: 1; transform: none; } }
+.animate-fade-in { animation: fade-in 1s cubic-bezier(.4,0,.2,1) both; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+.animate-bounce { animation: bounce 2s infinite; }
+    </style>
+{% endblock %}
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    window.calorieDailyData = {{ daily_data|safe }};
+    window.calorieWeeklyData = {{ weekly_data|safe }};
+    window.calorieMonthlyData = {{ monthly_data|safe }};
+    window.calorieDailyLabels = {{ daily_labels|safe }};
+    window.calorieWeeklyLabels = {{ weekly_labels|safe }};
+    window.calorieMonthlyLabels = {{ monthly_labels|safe }};
+    </script>
+    <script src="{% static 'myapp/js/main.js' %}"></script>
 {% endblock %}

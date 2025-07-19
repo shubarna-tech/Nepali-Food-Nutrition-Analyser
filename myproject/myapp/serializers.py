@@ -1,6 +1,7 @@
 # File: myapp/serializers.py
 from rest_framework import serializers
-from .models import Nutrition, Log
+
+from .models import Log, Nutrition
 
 
 class NutritionSerializer(serializers.ModelSerializer):

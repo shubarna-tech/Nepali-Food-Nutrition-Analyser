@@ -1,3 +1,6 @@
+// MUST be loaded as a regular script, tf is global
+// No import statements needed
+
 // Food class and nutrition mapping (should match backend)
 const FOOD_CLASSES = [
   "burger",
@@ -129,123 +132,191 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load models if needed
     try {
       console.log("Checking classifier model...");
-      if (!model) {
-        try {
-          model = await window.loadClassifierModel();
+    if (!model) {
+      try {
+        model = await window.loadClassifierModel();
           console.log("Classifier model loaded in captureAndClassify");
         } catch (e) {
           errorEl.textContent = "Failed to load classifier model";
           console.error("Failed to load classifier model", e);
-          return;
+        return;
         }
       }
-      console.log("Checking detector model...");
+      // Try to load detector model, but continue if it fails
       if (!detectorModel) {
         try {
           detectorModel = await window.loadDetectorModel();
           console.log("Detector model loaded in captureAndClassify");
         } catch (e) {
-          errorEl.textContent = "Failed to load detector model";
-          console.error("Failed to load detector model", e);
-          return;
+          detectorModel = null;
+          console.warn(
+            "Detector model not available, will use classifier-only mode.",
+          );
         }
       }
-      console.log("Models loaded, starting detection...");
+      console.log("Models loaded, starting detection/classification...");
     } catch (e) {
       console.error("Error during model loading:", e);
       errorEl.textContent = "Error during model loading.";
       return;
     }
 
-    // Run detection first
-    try {
-      console.log("Preparing input tensor for detection...");
-      const input = tf.image
-        .resizeBilinear(tf.browser.fromPixels(canvasEl), [128, 128])
-        .expandDims(0);
-      console.log("Calling detectorModel.executeAsync...");
-      const detResult = await detectorModel.executeAsync(input);
-      console.log("Detector model output:", detResult);
-      if (!detResult) {
-        console.error("Detector model returned null/undefined");
-        errorEl.textContent = "Detector model returned no output.";
+    // If detectorModel is available, use detection+classification
+    if (detectorModel) {
+      try {
+        console.log("Preparing input tensor for detection...");
+        const input = tf.image
+          .resizeBilinear(tf.browser.fromPixels(canvasEl), [128, 128])
+          .expandDims(0);
+        console.log("Calling detectorModel.executeAsync...");
+        const detResult = await detectorModel.executeAsync(input);
+        console.log("Detector model output:", detResult);
+        if (!detResult) {
+          console.error("Detector model returned null/undefined");
+          errorEl.textContent = "Detector model returned no output.";
+          return;
+        }
+        // Handle single tensor output [1, 4]
+        let boxesArr;
+        if (
+          detResult.shape &&
+          detResult.shape.length === 2 &&
+          detResult.shape[0] === 1 &&
+          detResult.shape[1] === 4
+        ) {
+          boxesArr = detResult.arraySync(); // [[ymin, xmin, ymax, xmax]]
+          console.log("Single box detected:", boxesArr[0]);
+        } else {
+          errorEl.textContent = "Detector model output shape not recognized.";
+          console.error("Unexpected detector output shape:", detResult.shape);
+          return;
+        }
+        // Clean up tensors
+        input.dispose();
+        detResult.dispose && detResult.dispose();
+        // If all zeros, or box is essentially the full image, treat as no detection
+        const box = boxesArr[0];
+        if (!box || box.every((v) => v === 0)) {
+          errorEl.textContent = "No food detected.";
+          resultSection.classList.add("hidden");
+          addMealBtn.classList.add("hidden");
+          console.log("No detection found (all zeros or full image).");
+          return;
+        }
+        // For the detected box, crop and classify
+        const [ymin, xmin, ymax, xmax] = box;
+        // Calculate portion area as percent of image
+        const boxW = (xmax - xmin) * canvasEl.width;
+        const boxH = (ymax - ymin) * canvasEl.height;
+        let portionPct =
+          ((boxW * boxH) / (canvasEl.width * canvasEl.height)) * 100;
+        // Remove edge correction logic
+        // Crop image data for classification
+        const cropX = Math.round(xmin * canvasEl.width);
+        const cropY = Math.round(ymin * canvasEl.height);
+        const cropW = Math.round(boxW);
+        const cropH = Math.round(boxH);
+        // Create a temp canvas for the crop
+        const cropCanvas = document.createElement("canvas");
+        cropCanvas.width = cropW;
+        cropCanvas.height = cropH;
+        const cropCtx = cropCanvas.getContext("2d");
+        cropCtx.drawImage(
+          canvasEl,
+          cropX,
+          cropY,
+          cropW,
+          cropH,
+          0,
+          0,
+          cropW,
+          cropH,
+        );
+        // Preprocess for classifier
+        let predClass = null,
+          predConf = null;
+        try {
+          let imgTensor = tf.browser.fromPixels(cropCanvas);
+          const inputCls = tf.image
+            .resizeBilinear(imgTensor, [224, 224])
+            .div(255)
+            .expandDims(0);
+          imgTensor.dispose();
+          const pred = model.predict(inputCls);
+          predClass = pred.argMax(-1).dataSync()[0];
+          predConf = pred.max().dataSync()[0];
+          pred.dispose();
+          inputCls.dispose();
+        } catch (err) {
+          predClass = null;
+          predConf = null;
+          console.error("Classification error for detection:", err);
+        }
+        // Draw box
+        ctx.strokeStyle = "#059669";
+        ctx.lineWidth = 3;
+        const x = xmin * canvasEl.width;
+        const y = ymin * canvasEl.height;
+        const w = (xmax - xmin) * canvasEl.width;
+        const h = (ymax - ymin) * canvasEl.height;
+        ctx.strokeRect(x, y, w, h);
+        // Show result in UI
+        let html = "";
+        if (predClass !== null && predConf >= 0.7) {
+          const nut = FOOD_NUTRITION[predClass];
+          // Scale nutrition by portion percentage
+          const scale = portionPct / 100;
+          const estCalories = Math.round(nut.calories * scale);
+          const estProtein = (nut.protein * scale).toFixed(1);
+          const estFat = (nut.fat * scale).toFixed(1);
+          const estCarbs = (nut.carbs * scale).toFixed(1);
+          const estFiber = (nut.fiber * scale).toFixed(1);
+          html += `<div class="bg-green-50 rounded-xl shadow p-4 mb-4 flex flex-col items-center border border-green-100">
+            <img src="${cropCanvas.toDataURL("image/jpeg")}" alt="Food Crop" class="rounded-lg max-h-24 mb-2" />
+            <div class="font-bold text-lg text-green-800 mb-1">${FOOD_CLASSES[predClass].charAt(0).toUpperCase() + FOOD_CLASSES[predClass].slice(1)}</div>
+            <div class="text-gray-700 mb-1">Portion: ${portionPct.toFixed(1)}% of image</div>
+            <div class="text-gray-600">Estimated Calories: <b>${estCalories}</b> kcal</div>
+            <div class="text-gray-600">Estimated Protein: <b>${estProtein}</b> g</div>
+            <div class="text-gray-600">Estimated Fat: <b>${estFat}</b> g</div>
+            <div class="text-gray-600">Estimated Carbs: <b>${estCarbs}</b> g</div>
+            <div class="text-gray-600">Estimated Fiber: <b>${estFiber}</b> g</div>
+            <button id="add-meal-btn" class="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 text-lg font-semibold transition">Add</button>
+          </div>`;
+        } else {
+          html += `<div class="text-red-600 font-bold">Could not confidently identify food.</div>`;
+        }
+        resultSection.innerHTML = `<h3 class="text-xl font-semibold text-green-700 mb-2">Result</h3>${html}`;
+        resultSection.classList.remove("hidden");
+        errorEl.textContent = "";
+        // Add event listener for the new Add button
+        const addBtn = document.getElementById("add-meal-btn");
+        if (addBtn) {
+          addBtn.onclick = async () => {
+            // Use the last detected/estimated values for logging
+            await postResult(
+              predClass,
+              predConf,
+              cropCanvas.toDataURL("image/jpeg"),
+            );
+            addBtn.disabled = true;
+            addBtn.textContent = "Added!";
+          };
+        }
+      } catch (e) {
+        console.error("Detection error (exception):", e);
+        errorEl.textContent = "Detection error (exception).";
         return;
       }
-      // Handle single tensor output [1, 4]
-      let boxesArr;
-      if (
-        detResult.shape &&
-        detResult.shape.length === 2 &&
-        detResult.shape[0] === 1 &&
-        detResult.shape[1] === 4
-      ) {
-        boxesArr = detResult.arraySync(); // [[ymin, xmin, ymax, xmax]]
-        console.log("Single box detected:", boxesArr[0]);
-      } else {
-        errorEl.textContent = "Detector model output shape not recognized.";
-        console.error("Unexpected detector output shape:", detResult.shape);
-        return;
-      }
-      // Clean up tensors
-      input.dispose();
-      detResult.dispose && detResult.dispose();
-      // If all zeros, treat as no detection
-      const box = boxesArr[0];
-      if (!box || box.every((v) => v === 0)) {
-        errorEl.textContent = "No food detected.";
-        resultSection.classList.add("hidden");
-        addMealBtn.classList.add("hidden");
-        console.log("No detection found (all zeros).");
-        return;
-      }
-      // For the detected box, crop and classify
-      const [ymin, xmin, ymax, xmax] = box;
-      // Calculate portion area as percent of image
-      const boxW = (xmax - xmin) * canvasEl.width;
-      const boxH = (ymax - ymin) * canvasEl.height;
-      let portionPct =
-        ((boxW * boxH) / (canvasEl.width * canvasEl.height)) * 100;
-      // If box touches any image edge, halve the portion estimate
-      let edgeCorrection = false;
-      if (
-        Math.abs(xmin) < 0.01 ||
-        Math.abs(ymin) < 0.01 ||
-        Math.abs(xmax - 1) < 0.01 ||
-        Math.abs(ymax - 1) < 0.01
-      ) {
-        portionPct = portionPct / 2;
-        edgeCorrection = true;
-      }
-      // Crop image data for classification
-      const cropX = Math.round(xmin * canvasEl.width);
-      const cropY = Math.round(ymin * canvasEl.height);
-      const cropW = Math.round(boxW);
-      const cropH = Math.round(boxH);
-      // Create a temp canvas for the crop
-      const cropCanvas = document.createElement("canvas");
-      cropCanvas.width = cropW;
-      cropCanvas.height = cropH;
-      const cropCtx = cropCanvas.getContext("2d");
-      cropCtx.drawImage(
-        canvasEl,
-        cropX,
-        cropY,
-        cropW,
-        cropH,
-        0,
-        0,
-        cropW,
-        cropH,
-      );
-      // Preprocess for classifier
+    } else {
+      // Classifier-only fallback: run classification on the whole image, then estimate portion as 100%
       let predClass = null,
         predConf = null;
       try {
-        let imgTensor = tf.browser.fromPixels(cropCanvas);
+        let imgTensor = tf.browser.fromPixels(canvasEl);
         const inputCls = tf.image
           .resizeBilinear(imgTensor, [224, 224])
-          .div(255)
-          .expandDims(0);
+                        .div(255)
+                        .expandDims(0);
         imgTensor.dispose();
         const pred = model.predict(inputCls);
         predClass = pred.argMax(-1).dataSync()[0];
@@ -255,21 +326,13 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         predClass = null;
         predConf = null;
-        console.error("Classification error for detection:", err);
+        console.error("Classification error (classifier-only):", err);
       }
-      // Draw box
-      ctx.strokeStyle = "#059669";
-      ctx.lineWidth = 3;
-      const x = xmin * canvasEl.width;
-      const y = ymin * canvasEl.height;
-      const w = (xmax - xmin) * canvasEl.width;
-      const h = (ymax - ymin) * canvasEl.height;
-      ctx.strokeRect(x, y, w, h);
-      // Show result in UI
       let html = "";
       if (predClass !== null && predConf >= 0.7) {
         const nut = FOOD_NUTRITION[predClass];
-        // Scale nutrition by portion percentage
+        // Portion is 100% of image
+        const portionPct = 100;
         const scale = portionPct / 100;
         const estCalories = Math.round(nut.calories * scale);
         const estProtein = (nut.protein * scale).toFixed(1);
@@ -277,9 +340,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const estCarbs = (nut.carbs * scale).toFixed(1);
         const estFiber = (nut.fiber * scale).toFixed(1);
         html += `<div class="bg-green-50 rounded-xl shadow p-4 mb-4 flex flex-col items-center border border-green-100">
-          <img src="${cropCanvas.toDataURL("image/jpeg")}" alt="Food Crop" class="rounded-lg max-h-24 mb-2" />
+          <img src="${canvasEl.toDataURL("image/jpeg")}" alt="Food" class="rounded-lg max-h-24 mb-2" />
           <div class="font-bold text-lg text-green-800 mb-1">${FOOD_CLASSES[predClass].charAt(0).toUpperCase() + FOOD_CLASSES[predClass].slice(1)}</div>
-          <div class="text-gray-700 mb-1">Portion: ${portionPct.toFixed(1)}% of image</div>
+          <div class="text-gray-700 mb-1">Portion: 100% of image</div>
           <div class="text-gray-600">Estimated Calories: <b>${estCalories}</b> kcal</div>
           <div class="text-gray-600">Estimated Protein: <b>${estProtein}</b> g</div>
           <div class="text-gray-600">Estimated Fat: <b>${estFat}</b> g</div>
@@ -297,20 +360,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const addBtn = document.getElementById("add-meal-btn");
       if (addBtn) {
         addBtn.onclick = async () => {
-          // Use the last detected/estimated values for logging
           await postResult(
             predClass,
             predConf,
-            cropCanvas.toDataURL("image/jpeg"),
+            canvasEl.toDataURL("image/jpeg"),
           );
           addBtn.disabled = true;
           addBtn.textContent = "Added!";
         };
       }
-    } catch (e) {
-      console.error("Detection error (exception):", e);
-      errorEl.textContent = "Detection error (exception).";
-      return;
     }
   }
 

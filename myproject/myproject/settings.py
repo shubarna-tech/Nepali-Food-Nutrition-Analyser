@@ -5,8 +5,14 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "your-secret-key"
 DEBUG = True
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.88.12"]
-
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".ngrok.io",
+    ".ngrok-free.app",
+    "667aa8d3b322.ngrok-free.app ",
+    "0.0.0.0",
+]
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -16,9 +22,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "myapp",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -81,3 +89,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Redirect after login
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
+
+CSRF_TRUSTED_ORIGINS = ["https://*.ngrok.io", "https://*.ngrok-free.app"]
+
+CORS_ALLOW_ALL_ORIGINS = True

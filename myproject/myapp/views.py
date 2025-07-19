@@ -1,30 +1,26 @@
 # File: myapp/views.py
 
-from django.shortcuts import render
+from datetime import date, timedelta
+
+from django import forms
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Count, Sum
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone  # ← import this
-from .models import Nutrition
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Log
-from .serializers import NutritionSerializer, LogSerializer
-from datetime import timedelta
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login, authenticate
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import User
-from django import forms
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.db.models import Sum
-from datetime import timedelta, date
-from .models import UserGoal, WaterLog
+
 from .forms import UserGoalForm, WaterLogForm
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count
-from django.http import Http404
-from django.contrib.auth import get_user_model
+from .models import Log, Nutrition, UserGoal, WaterLog
+from .serializers import LogSerializer, NutritionSerializer
 
 
 class RegistrationForm(forms.ModelForm):
@@ -566,6 +562,7 @@ def admin_analytics_dashboard(request):
     total_users = User.objects.count()
     active_users = User.objects.filter(is_active=True).count()
     from datetime import timedelta
+
     from django.utils import timezone
 
     now = timezone.now()
@@ -713,6 +710,12 @@ def admin_analytics_dashboard(request):
     if len(trend_fiber) < 7:
         trend_fiber += [0] * (7 - len(trend_fiber))
 
+    # Add last registered user and total meals
+    last_registered_user = User.objects.order_by('-date_joined').first()
+    total_meals = Nutrition.objects.count()
+
+    all_users = User.objects.order_by('-date_joined')
+
     context = {
         "total_users": total_users,
         "active_users": active_users,
@@ -730,6 +733,9 @@ def admin_analytics_dashboard(request):
         "retention_pct": retention_pct,
         "user_growth": user_growth,
         "scan_growth": scan_growth,
+        "last_registered_user": last_registered_user,
+        "total_meals": total_meals,
+        "all_users": all_users,
     }
     context.update(
         {

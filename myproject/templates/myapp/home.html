@@ -1,192 +1,107 @@
-{% extends 'myapp/base.html' %} {% block title %}Welcome to DalByte{% endblock
-%} {% block content %}
-<div
-  class="relative min-h-[70vh] flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-emerald-100 to-green-200 py-12 overflow-hidden"
->
-  <!-- Hero Section -->
-  <div
-    class="relative z-10 bg-white/90 rounded-3xl shadow-2xl p-10 max-w-2xl w-full flex flex-col items-center backdrop-blur-md animate-fade-in"
-  >
-    <h1 class="text-5xl font-extrabold text-green-700 mb-3 drop-shadow-lg">
-      Welcome to DalByte
-    </h1>
-    <p class="text-xl text-emerald-700 mb-4 font-semibold italic">
-      Your AI-powered food recognition & nutrition tracker
-    </p>
-    <p class="text-base text-gray-600 mb-8 max-w-lg">
-      Snap a photo of your meal, instantly get nutrition facts, and track your
-      healthy journey. DalByte makes eating smart effortless and fun!
-    </p>
-  </div>
-  <!-- Features Carousel -->
-  <div class="w-full max-w-5xl mt-12">
-    <div class="relative">
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 justify-center items-stretch w-full px-2 md:px-0"
-      >
-        <!-- Feature Cards -->
-        <div
-          class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card"
-        >
-          <span class="text-4xl mb-2">📷</span>
-          <h3 class="text-xl font-bold text-green-700 mb-1">
-            Food Recognition
-          </h3>
-          <p class="text-gray-600 text-center">
-            Use your camera to instantly identify foods and get nutrition info.
-          </p>
+{% extends 'myapp/base.html' %}
+{% block title %}Welcome to DalByte{% endblock %}
+{% block content %}
+    <div class="relative min-h-[70vh] flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-emerald-100 to-green-200 py-12 overflow-hidden">
+        <!-- Hero Section -->
+        <div class="relative z-10 bg-white/90 rounded-3xl shadow-2xl p-10 max-w-2xl w-full flex flex-col items-center backdrop-blur-md animate-fade-in">
+            <h1 class="text-5xl font-extrabold text-green-700 mb-3 drop-shadow-lg">Welcome to DalByte</h1>
+            <p class="text-xl text-emerald-700 mb-4 font-semibold italic">Your AI-powered food recognition & nutrition tracker</p>
+            <p class="text-base text-gray-600 mb-8 max-w-lg">
+                Snap a photo of your meal, instantly get nutrition facts, and track your healthy journey. DalByte makes eating smart effortless and fun!
+            </p>
         </div>
-        <div
-          class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card"
-        >
-          <span class="text-4xl mb-2">📊</span>
-          <h3 class="text-xl font-bold text-green-700 mb-1">
-            Nutrition Tracking
-          </h3>
-          <p class="text-gray-600 text-center">
-            Track calories, macros, and more for every meal you log.
-          </p>
+        <!-- Features Carousel -->
+        <div class="w-full max-w-5xl mt-12">
+            <div class="relative">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 justify-center items-stretch w-full px-2 md:px-0">
+                    <!-- Feature Cards -->
+                    <div class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card">
+                        <span class="text-4xl mb-2">📷</span>
+                        <h3 class="text-xl font-bold text-green-700 mb-1">Food Recognition</h3>
+                        <p class="text-gray-600 text-center">Use your camera to instantly identify foods and get nutrition info.</p>
+                    </div>
+                    <div class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card">
+                        <span class="text-4xl mb-2">📊</span>
+                        <h3 class="text-xl font-bold text-green-700 mb-1">Nutrition Tracking</h3>
+                        <p class="text-gray-600 text-center">Track calories, macros, and more for every meal you log.</p>
+                    </div>
+                    <div class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card">
+                        <span class="text-4xl mb-2">🎉</span>
+                        <h3 class="text-xl font-bold text-green-700 mb-1">Cheat Day</h3>
+                        <p class="text-gray-600 text-center">Enjoy a special cheat day every week with fun rewards and admin controls.</p>
+                    </div>
+                    <div class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card">
+                        <span class="text-4xl mb-2">🕑</span>
+                        <h3 class="text-xl font-bold text-green-700 mb-1">History & Progress</h3>
+                        <p class="text-gray-600 text-center">View your food history, progress charts, and analytics at a glance.</p>
+                    </div>
+                    <div class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card">
+                        <span class="text-4xl mb-2">💧</span>
+                        <h3 class="text-xl font-bold text-green-700 mb-1">Water & Wellness</h3>
+                        <p class="text-gray-600 text-center">Log your water intake and get reminders to stay hydrated.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div
-          class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card"
-        >
-          <span class="text-4xl mb-2">🎉</span>
-          <h3 class="text-xl font-bold text-green-700 mb-1">Cheat Day</h3>
-          <p class="text-gray-600 text-center">
-            Enjoy a special cheat day every week with fun rewards and admin
-            controls.
-          </p>
+        <!-- Dynamic Fun Fact Section -->
+        <div class="w-full flex flex-col items-center mt-10 mb-8 relative">
+            <div class="absolute left-4 top-0 animate-float-emoji text-6xl opacity-30 pointer-events-none">🥟</div>
+            <div class="absolute right-8 bottom-0 animate-float-emoji2 text-5xl opacity-20 pointer-events-none">🍔</div>
+            <div class="bg-white/80 rounded-2xl shadow-lg px-8 py-6 max-w-xl w-full flex flex-col items-center">
+                <span class="text-lg font-semibold text-green-700 mb-2">Did you know?</span>
+                <div id="fun-fact" class="text-xl text-gray-700 text-center font-mono"></div>
+            </div>
         </div>
-        <div
-          class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card"
-        >
-          <span class="text-4xl mb-2">🕑</span>
-          <h3 class="text-xl font-bold text-green-700 mb-1">
-            History & Progress
-          </h3>
-          <p class="text-gray-600 text-center">
-            View your food history, progress charts, and analytics at a glance.
-          </p>
-        </div>
-        <div
-          class="feature-card-static bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center feature-card"
-        >
-          <span class="text-4xl mb-2">💧</span>
-          <h3 class="text-xl font-bold text-green-700 mb-1">
-            Water & Wellness
-          </h3>
-          <p class="text-gray-600 text-center">
-            Log your water intake and get reminders to stay hydrated.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Dynamic Fun Fact Section -->
-  <div class="w-full flex flex-col items-center mt-10 mb-8 relative">
-    <div
-      class="absolute left-4 top-0 animate-float-emoji text-6xl opacity-30 pointer-events-none"
-    >
-      🥟
-    </div>
-    <div
-      class="absolute right-8 bottom-0 animate-float-emoji2 text-5xl opacity-20 pointer-events-none"
-    >
-      🍔
-    </div>
-    <div
-      class="bg-white/80 rounded-2xl shadow-lg px-8 py-6 max-w-xl w-full flex flex-col items-center"
-    >
-      <span class="text-lg font-semibold text-green-700 mb-2"
-        >Did you know?</span
-      >
-      <div
-        id="fun-fact"
-        class="text-xl text-gray-700 text-center font-mono"
-      ></div>
-    </div>
-  </div>
-  <style>
-    .feature-card {
-      transition: transform 0.3s;
-    }
-    .feature-card:hover {
-      transform: translateY(-8px) scale(1.04);
-      box-shadow: 0 8px 32px #0002;
-    }
-    /* Hide scrollbars on all browsers */
-    #feature-carousel::-webkit-scrollbar {
-      display: none;
-    }
-    #feature-carousel {
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-    /* Responsive feature cards */
-    .feature-card-static {
-      min-width: 0;
-      width: 100%;
-      max-width: 340px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    @keyframes float-emoji {
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-18px);
-      }
-    }
-    .animate-float-emoji {
-      animation: float-emoji 4s ease-in-out infinite;
-    }
-    @keyframes float-emoji2 {
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(14px);
-      }
-    }
-    .animate-float-emoji2 {
-      animation: float-emoji2 5s ease-in-out infinite;
-    }
-  </style>
-  <script>
-    // Fun Fact Rotator
-    const funFacts = [
-      "An apple is 25% air, which is why it floats!",
-      "Honey never spoils. Archaeologists have eaten 3000-year-old honey!",
-      "Carrots were originally purple, not orange.",
-      "The most expensive pizza in the world costs over $12,000!",
-      "Bananas are berries, but strawberries aren't.",
-      "Broccoli contains more protein than steak per calorie.",
-      "Peanuts are not nuts—they're legumes!",
-      "The popsicle was invented by an 11-year-old.",
-      "Tomatoes were once considered poisonous in Europe.",
-      "Cucumbers are 96% water.",
-      "The world’s largest omelette weighed over 6 tons!",
-      "A group of flamingos is called a 'flamboyance'.",
-      "Potatoes were the first food grown in space.",
-      "Ripe cranberries will bounce like rubber balls.",
-      "Ketchup was once sold as medicine.",
-      "Cheese is the most stolen food in the world.",
-      "India is the world's largest producer of milk.",
-      "Chili peppers can help boost your metabolism.",
-      "The hottest chili pepper is called the Carolina Reaper.",
-      "Eating spicy food can make you live longer!",
-    ];
-    const funFactDiv = document.getElementById("fun-fact");
-    let factIdx = Math.floor(Math.random() * funFacts.length);
-    function showFact() {
-      if (funFactDiv) funFactDiv.textContent = funFacts[factIdx];
-      factIdx = (factIdx + 1) % funFacts.length;
-    }
-    showFact();
-    let factInterval = setInterval(showFact, 4000);
-  </script>
-  {% endblock %}
-</div>
+        <style>
+.feature-card { transition: transform 0.3s; }
+.feature-card:hover { transform: translateY(-8px) scale(1.04); box-shadow: 0 8px 32px #0002; }
+/* Hide scrollbars on all browsers */
+#feature-carousel::-webkit-scrollbar { display: none; }
+#feature-carousel { scrollbar-width: none; -ms-overflow-style: none; }
+/* Responsive feature cards */
+.feature-card-static {
+  min-width: 0;
+  width: 100%;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@keyframes float-emoji { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-18px);} }
+.animate-float-emoji { animation: float-emoji 4s ease-in-out infinite; }
+@keyframes float-emoji2 { 0%,100%{transform:translateY(0);} 50%{transform:translateY(14px);} }
+.animate-float-emoji2 { animation: float-emoji2 5s ease-in-out infinite; }
+        </style>
+        <script>
+// Fun Fact Rotator
+const funFacts = [
+  "An apple is 25% air, which is why it floats!",
+  "Honey never spoils. Archaeologists have eaten 3000-year-old honey!",
+  "Carrots were originally purple, not orange.",
+  "The most expensive pizza in the world costs over $12,000!",
+  "Bananas are berries, but strawberries aren't.",
+  "Broccoli contains more protein than steak per calorie.",
+  "Peanuts are not nuts—they're legumes!",
+  "The popsicle was invented by an 11-year-old.",
+  "Tomatoes were once considered poisonous in Europe.",
+  "Cucumbers are 96% water.",
+  "The world’s largest omelette weighed over 6 tons!",
+  "A group of flamingos is called a 'flamboyance'.",
+  "Potatoes were the first food grown in space.",
+  "Ripe cranberries will bounce like rubber balls.",
+  "Ketchup was once sold as medicine.",
+  "Cheese is the most stolen food in the world.",
+  "India is the world's largest producer of milk.",
+  "Chili peppers can help boost your metabolism.",
+  "The hottest chili pepper is called the Carolina Reaper.",
+  "Eating spicy food can make you live longer!"
+];
+const funFactDiv = document.getElementById('fun-fact');
+let factIdx = Math.floor(Math.random() * funFacts.length);
+function showFact() {
+  if (funFactDiv) funFactDiv.textContent = funFacts[factIdx];
+  factIdx = (factIdx + 1) % funFacts.length;
+}
+showFact();
+let factInterval = setInterval(showFact, 4000);
+        </script>
+    {% endblock %}

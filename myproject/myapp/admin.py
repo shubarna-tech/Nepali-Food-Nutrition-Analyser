@@ -1,6 +1,7 @@
 # File: myapp/admin.py
 from django.contrib import admin
-from .models import Nutrition, Log
+
+from .models import Log, Nutrition
 
 
 @admin.register(Nutrition)

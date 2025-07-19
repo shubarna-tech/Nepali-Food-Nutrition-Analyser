@@ -1,7 +1,7 @@
 # File: myproject/urls.py
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
 urlpatterns = [
     # Your app’s pages: dashboard, scan, history, cheat-day

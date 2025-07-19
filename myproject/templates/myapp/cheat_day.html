@@ -1,401 +1,199 @@
 <!-- File: templates/myapp/cheat_day.html -->
-{% extends 'myapp/base.html' %} {% block title %}Cheat Day{% endblock %} {%
-block content %}
-<div
-  class="relative min-h-[80vh] flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-emerald-100 to-green-200 py-12 overflow-hidden"
->
-  <!-- Hero Section -->
-  <div class="relative z-10 w-full max-w-2xl flex flex-col items-center">
-    <div class="flex flex-col items-center mb-8">
-      <div class="flex items-center gap-2 mb-2">
-        <span class="text-5xl animate-emoji-bounce">🍩</span>
-        <h1
-          class="text-5xl font-extrabold text-pink-600 drop-shadow-lg tracking-tight animate-title-pop"
-        >
-          Cheat Day
-        </h1>
-        <span class="text-5xl animate-emoji-bounce">🍕</span>
-      </div>
-      <p class="text-xl text-pink-700 font-semibold italic mb-2">
-        Celebrate your well-deserved treat!
-      </p>
-    </div>
-    {% if not user.is_superuser and not user.is_staff %}
-    <!-- Modern Countdown Timer for normal users only -->
-    <div class="w-full flex flex-col items-center mb-8">
-      <div class="text-center">
-        <span class="text-lg font-semibold text-pink-700"
-          >Time until your next Cheat Day</span
-        >
-        <div
-          id="digital-countdown"
-          class="mt-4 text-4xl md:text-6xl font-mono text-green-700 bg-white/80 rounded-2xl px-8 py-4 shadow-lg animate-countdown-fade"
-        ></div>
-      </div>
-    </div>
-    {% endif %} {% if is_super %}
-    <form
-      method="get"
-      class="mb-6 flex flex-col md:flex-row gap-2 items-center justify-center"
-    >
-      <label for="user_id" class="font-semibold text-gray-700"
-        >Select User:</label
-      >
-      <select
-        name="user_id"
-        id="user_id"
-        class="ml-2 px-3 py-2 rounded-lg border border-pink-300 focus:ring-pink-400 focus:border-pink-400 bg-pink-50 text-pink-700 font-semibold"
-        onchange="this.form.submit()"
-      >
-        {% for user in all_users %}
-        <option
-          value="{{ user.id }}"
-          {%
-          if
-          user.id=""
-          ="selected_user.id"
-          %}selected{%
-          endif
-          %}
-        >
-          {{ user.username }}
-        </option>
-        {% endfor %}
-      </select>
-    </form>
-    {% if success_message %}
-    <div class="mb-4 text-green-700 font-semibold text-center">
-      {{ success_message }}
-    </div>
-    {% endif %} {% endif %}
-    <!-- Cheat Day Selection Card -->
-    <div
-      class="w-full max-w-lg bg-white/90 rounded-3xl shadow-2xl p-8 flex flex-col items-center mb-8 backdrop-blur-md"
-    >
-      <div class="w-full flex flex-col items-center mb-4">
-        <h2 class="text-2xl font-bold text-pink-700 mb-2">
-          {% if is_super %}Set Cheat Day for:
-          <span class="text-green-700">{{ selected_user.username }}</span>{%
-          else %}Set Your Cheat Day{% endif %}
-        </h2>
-        <form method="post" class="w-full flex flex-col items-center">
-          {% csrf_token %} {% if is_super %}
-          <input type="hidden" name="user_id" value="{{ selected_user.id }}" />
-          {% endif %}
-          <div
-            class="flex flex-row flex-wrap justify-center gap-2 mb-4 mt-2 w-full overflow-x-auto px-2"
-          >
-            {% for i in status.days_of_week %}
-            <button
-              type="button"
-              class="cheatday-pill mx-1 my-1 px-4 py-2 rounded-full border-2 font-semibold focus:outline-none focus:ring-2 transition-all duration-150 {% if forloop.counter0 == status.cheat_day_num %}bg-pink-500 text-white border-pink-600 ring-pink-300{% else %}bg-gray-100 text-pink-700 border-pink-200 hover:bg-pink-100{% endif %}"
-              onclick="document.getElementById('cheat_day').value='{{ forloop.counter0 }}'; selectPill(this);"
-              {%
-              if
-              not
-              status.can_edit
-              %}disabled
-              style="opacity: 0.5; cursor: not-allowed"
-              {%
-              endif
-              %}
-            >
-              {{ i }} {% if forloop.counter0 == status.cheat_day_num %}<span
-                class="ml-1"
-                >✔️</span
-              >{% endif %}
-            </button>
-            {% endfor %}
-          </div>
-          <!-- Hidden dropdown for accessibility/fallback -->
-          <select name="cheat_day" id="cheat_day" class="hidden">
-            {% for i in status.days_of_week %}
-            <option
-              value="{{ forloop.counter0 }}"
-              {%
-              if
-              forloop.counter0=""
-              ="status.cheat_day_num"
-              %}selected{%
-              endif
-              %}
-            >
-              {{ i }}
-            </option>
-            {% endfor %}
-          </select>
-          <button
-            type="submit"
-            class="mt-2 px-6 py-2 bg-pink-500 text-white font-bold rounded-lg shadow hover:bg-pink-600 text-lg transition"
-            {%
-            if
-            not
-            status.can_edit
-            %}disabled
-            style="opacity: 0.5; cursor: not-allowed"
-            {%
-            endif
-            %}
-          >
-            Set Cheat Day
-          </button>
-        </form>
-        {% if success_message %}
-        <div class="mt-4 text-green-700 font-semibold text-center">
-          {{ success_message }}
+{% extends 'myapp/base.html' %}
+{% block title %}Cheat Day{% endblock %}
+{% block content %}
+    <div class="relative min-h-[80vh] flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-emerald-100 to-green-200 py-12 overflow-hidden">
+        <!-- Hero Section -->
+        <div class="relative z-10 w-full max-w-2xl flex flex-col items-center">
+            <div class="flex flex-col items-center mb-8">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-5xl animate-emoji-bounce">🍩</span>
+                    <h1 class="text-5xl font-extrabold text-pink-600 drop-shadow-lg tracking-tight animate-title-pop">Cheat Day</h1>
+                    <span class="text-5xl animate-emoji-bounce">🍕</span>
+                </div>
+                <p class="text-xl text-pink-700 font-semibold italic mb-2">Celebrate your well-deserved treat!</p>
+            </div>
+            {% if not user.is_superuser and not user.is_staff %}
+                <!-- Modern Countdown Timer for normal users only -->
+                <div class="w-full flex flex-col items-center mb-8">
+                    <div class="text-center">
+                        <span class="text-lg font-semibold text-pink-700">Time until your next Cheat Day</span>
+                        <div id="digital-countdown"
+                             class="mt-4 text-4xl md:text-6xl font-mono text-green-700 bg-white/80 rounded-2xl px-8 py-4 shadow-lg animate-countdown-fade">
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if is_super %}
+                <form method="get"
+                      class="mb-6 flex flex-col md:flex-row gap-2 items-center justify-center">
+                    <label for="user_id" class="font-semibold text-gray-700">Select User:</label>
+                    <select name="user_id"
+                            id="user_id"
+                            class="ml-2 px-3 py-2 rounded-lg border border-pink-300 focus:ring-pink-400 focus:border-pink-400 bg-pink-50 text-pink-700 font-semibold"
+                            onchange="this.form.submit()">
+                        {% for user in all_users %}
+                            <option value="{{ user.id }}"
+                                    {% if user.id == selected_user.id %}selected{% endif %}>
+                                {{ user.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+                {% if success_message %}
+                    <div class="mb-4 text-green-700 font-semibold text-center">{{ success_message }}</div>
+                {% endif %}
+            {% endif %}
+            <!-- Cheat Day Selection Card -->
+            <div class="w-full max-w-lg bg-white/90 rounded-3xl shadow-2xl p-8 flex flex-col items-center mb-8 backdrop-blur-md">
+                <div class="w-full flex flex-col items-center mb-4">
+                    <h2 class="text-2xl font-bold text-pink-700 mb-2">
+                        {% if is_super %}
+                            Set Cheat Day for: <span class="text-green-700">{{ selected_user.username }}</span>
+                        {% else %}
+                            Set Your Cheat Day
+                        {% endif %}
+                    </h2>
+                    <form method="post" class="w-full flex flex-col items-center">
+                        {% csrf_token %}
+                        {% if is_super %}<input type="hidden" name="user_id" value="{{ selected_user.id }}" />{% endif %}
+                        <div class="flex flex-row flex-wrap justify-center gap-2 mb-4 mt-2 w-full overflow-x-auto px-2">
+                            {% for i in status.days_of_week %}
+                                <button type="button"
+                                        class="cheatday-pill mx-1 my-1 px-4 py-2 rounded-full border-2 font-semibold focus:outline-none focus:ring-2 transition-all duration-150 {% if forloop.counter0 == status.cheat_day_num %}bg-pink-500 text-white border-pink-600 ring-pink-300{% else %}bg-gray-100 text-pink-700 border-pink-200 hover:bg-pink-100{% endif %}"
+                                        onclick="document.getElementById('cheat_day').value='{{ forloop.counter0 }}'; selectPill(this);"
+                                        {% if not status.can_edit %}disabled style="opacity:0.5;cursor:not-allowed;"{% endif %}>
+                                    {{ i }}
+                                    {% if forloop.counter0 == status.cheat_day_num %}<span class="ml-1">✔️</span>{% endif %}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <!-- Hidden dropdown for accessibility/fallback -->
+                        <select name="cheat_day" id="cheat_day" class="hidden">
+                            {% for i in status.days_of_week %}
+                                <option value="{{ forloop.counter0 }}"
+                                        {% if forloop.counter0 == status.cheat_day_num %}selected{% endif %}>
+                                    {{ i }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit"
+                                class="mt-2 px-6 py-2 bg-pink-500 text-white font-bold rounded-lg shadow hover:bg-pink-600 text-lg transition"
+                                {% if not status.can_edit %}disabled style="opacity:0.5;cursor:not-allowed;"{% endif %}>
+                            Set Cheat Day
+                        </button>
+                    </form>
+                    {% if success_message %}
+                        <div class="mt-4 text-green-700 font-semibold text-center">{{ success_message }}</div>
+                    {% endif %}
+                    {% if not status.can_edit and not is_super %}
+                        <div class="text-xs text-gray-500 mt-2">You can change your cheat day next week.</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="w-full flex flex-col items-center mt-6">
+                {% if status.is_cheat_day %}
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl"></span>
+                        <span class="text-2xl font-bold text-pink-600">It’s your Cheat Day!</span>
+                        <span class="text-lg text-yellow-700 mt-2">Enjoy your treats and celebrate!</span>
+                    </div>
+                {% endif %}
+            </div>
+            <!-- Celebration Modal (only on cheat day) -->
+            {% if status.is_cheat_day %}
+                <div id="cheat-modal"
+                     class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40"
+                     style="display:none">
+                    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full flex flex-col items-center">
+                        <h3 class="text-3xl font-extrabold text-pink-600 mb-2">🎉 Happy Cheat Day! 🎉</h3>
+                        <span class="inline-block bg-yellow-200 text-yellow-800 font-bold px-4 py-2 rounded-full shadow mb-4">🏅 Cheat Day Champion!</span>
+                        <p class="italic text-lg text-gray-700 mb-4" id="cheat-quote"></p>
+                        <div class="mb-4">
+                            <span class="block text-pink-700 font-semibold">🍽️ Fun Fact:</span>
+                            <span id="fun-fact" class="text-gray-600"></span>
+                        </div>
+                        <button onclick="document.getElementById('cheat-modal').style.display='none'"
+                                class="mt-4 px-6 py-2 bg-pink-500 text-white rounded-lg font-bold shadow hover:bg-pink-600">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
         </div>
-        {% endif %} {% if not status.can_edit and not is_super %}
-        <div class="text-xs text-gray-500 mt-2">
-          You can change your cheat day next week.
-        </div>
-        {% endif %}
-      </div>
     </div>
-    <div class="w-full flex flex-col items-center mt-6">
-      {% if status.is_cheat_day %}
-      <div class="flex flex-col items-center">
-        <span class="text-3xl"></span>
-        <span class="text-2xl font-bold text-pink-600"
-          >It’s your Cheat Day!</span
-        >
-        <span class="text-lg text-yellow-700 mt-2"
-          >Enjoy your treats and celebrate!</span
-        >
-      </div>
-      {% endif %}
-    </div>
-    <!-- Celebration Modal (only on cheat day) -->
-    {% if status.is_cheat_day %}
-    <div
-      id="cheat-modal"
-      class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40"
-      style="display: none"
-    >
-      <div
-        class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full flex flex-col items-center"
-      >
-        <h3 class="text-3xl font-extrabold text-pink-600 mb-2">
-          🎉 Happy Cheat Day! 🎉
-        </h3>
-        <span
-          class="inline-block bg-yellow-200 text-yellow-800 font-bold px-4 py-2 rounded-full shadow mb-4"
-          >🏅 Cheat Day Champion!</span
-        >
-        <p class="italic text-lg text-gray-700 mb-4" id="cheat-quote"></p>
-        <div class="mb-4">
-          <span class="block text-pink-700 font-semibold">🍽️ Fun Fact:</span>
-          <span id="fun-fact" class="text-gray-600"></span>
-        </div>
-        <button
-          onclick="document.getElementById('cheat-modal').style.display='none'"
-          class="mt-4 px-6 py-2 bg-pink-500 text-white rounded-lg font-bold shadow hover:bg-pink-600"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-    {% endif %}
-    <!-- Random Award Section -->
-    <div class="w-full flex flex-col items-center mt-10">
-      <div class="flex flex-col items-center">
-        <div class="relative flex flex-col items-center">
-          <button
-            id="award-btn"
-            class="px-8 py-4 bg-green-500 text-white font-extrabold rounded-full shadow-lg hover:bg-green-600 text-2xl"
-            {%
-            if
-            not
-            is_super
-            and
-            status.is_cheat_day
-            !="True"
-            %}disabled
-            style="opacity: 0.5; cursor: not-allowed"
-            {%
-            endif
-            %}
-          >
-            Reveal My Award
-          </button>
-          <div
-            id="award-loading"
-            class="mt-6 text-lg font-mono text-gray-500 hidden"
-          >
-            Random Award is Loading<span id="award-dots">...</span>
-          </div>
-          <div
-            id="award-result"
-            class="mt-6 text-2xl font-bold text-pink-700"
-          ></div>
-          {% if not is_super and not status.is_cheat_day %}
-          <div class="mt-2 text-sm text-red-600 font-semibold">
-            You can only reveal your reward on your Cheat Day!
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<style>
-  @keyframes emoji-bounce {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-12px);
-    }
-  }
-  .animate-emoji-bounce {
-    animation: emoji-bounce 2s infinite;
-  }
-  @keyframes title-pop {
-    0% {
-      transform: scale(0.8);
-      opacity: 0;
-    }
-    80% {
-      transform: scale(1.05);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-  .animate-title-pop {
-    animation: title-pop 1s cubic-bezier(0.4, 0, 0.2, 1) both;
-  }
-  @keyframes countdown-fade {
-    from {
-      opacity: 0;
-      transform: translateY(24px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  .animate-countdown-fade {
-    animation: countdown-fade 1s cubic-bezier(0.4, 0, 0.2, 1) both;
-  }
-  .cheatday-pill {
-    min-width: 90px;
-    cursor: pointer;
-  }
-  .cheatday-pill[disabled] {
-    cursor: not-allowed;
-  }
-</style>
-{% if not user.is_superuser and not user.is_staff %}
-<script>
-  var countdownSeconds = {{ status.countdown_seconds|default:0|safe }};
-  {% if status.is_cheat_day %}
-    var todayStr = '{{ status.next_cheat_day|date:"Y-m-d" }}';
-  {% else %}
-    var todayStr = '';
-  {% endif %}
-  const quotes = [
-    "Life is uncertain. Eat dessert first!",
-    "You can't live a full life on an empty stomach.",
-    "Stressed spelled backwards is desserts.",
-    "There is no sincerer love than the love of food.",
-    "Eat what you love. Love what you eat.",
-    "Food is the ingredient that binds us together.",
-    "Good food = Good mood!"
-  ];
-  if (document.getElementById('cheat-quote')) {
-    document.getElementById('cheat-quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
-  }
-  const funFacts = [
-    "Did you know? The world’s largest pizza was over 13,000 square feet!",
-    "Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that’s still edible!",
-    "Apples float in water because they are 25% air.",
-    "The most expensive pizza in the world costs over $12,000 and takes 72 hours to make.",
-    "Carrots were originally purple in color.",
-    "Peanuts are not nuts—they’re legumes!",
-    "Bananas are berries, but strawberries aren’t.",
-    "A group of flamingos is called a 'flamboyance'.",
-    "The popsicle was invented by an 11-year-old by accident.",
-    "Tomatoes were once considered poisonous in Europe."
-  ];
-  if (document.getElementById('fun-fact')) {
-    document.getElementById('fun-fact').textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
-  }
-  // Random Award logic
-  const awards = [
-    // Nepali unhealthy foods
-    "Fried Momo 🍤",
-    "Sel Roti with Sugar 🍩",
-    "Jeri (Nepali Jalebi) 🍯",
-    "Lassi with Cream 🥛",
-    "Chowmein 🍜",
-    "Samosa Chatpate 🥟",
-    "Aloo Chop 🥔",
-    "Pani Puri (Nepali Style) 🥚",
-    "Pakauda (Fritters) 🍥",
-    "Buff Sukuti (Dried Spicy Meat) 🍖",
-    // Indian unhealthy foods
-    "Pav Bhaji with Extra Butter 🍞🧈",
-    "Chole Bhature 🍲🥯",
-    "Paneer Tikka Pizza 🍕",
-    "Butter Chicken with Naan 🍗🍞",
-    "Vada Pav 🍔",
-    "Gulab Jamun 🍡",
-    "Jalebi 🍯",
-    "Samosa ��",
-    "Kachori 🥯",
-    "Dahi Puri 🥚"
-  ];
-  document.addEventListener('DOMContentLoaded', function() {
-    const awardBtn = document.getElementById('award-btn');
-    const awardLoading = document.getElementById('award-loading');
-    const awardDots = document.getElementById('award-dots');
-    const awardResult = document.getElementById('award-result');
-    var isSuper = '{{ is_super|yesno:"true,false" }}';
-    var isCheatDay = '{{ status.is_cheat_day|yesno:"true,false" }}';
-    isSuper = (isSuper === 'true');
-    isCheatDay = (isCheatDay === 'true');
-    if (awardBtn && awardLoading && awardDots && awardResult) {
-      awardBtn.onclick = function() {
-        if (!(isSuper === true || isCheatDay === true)) return;
-        awardBtn.disabled = true;
-        awardBtn.style.opacity = 0.5;
-        awardLoading.classList.remove('hidden');
-        awardResult.textContent = '';
-        let dots = 0;
-        const dotInterval = setInterval(() => {
-          dots = (dots + 1) % 4;
-          awardDots.textContent = '.'.repeat(dots + 1);
-        }, 400);
-        setTimeout(() => {
-          clearInterval(dotInterval);
-          awardLoading.classList.add('hidden');
-          const result = awards[Math.floor(Math.random() * awards.length)];
-          awardResult.textContent = result;
-          awardBtn.disabled = false;
-          awardBtn.style.opacity = 1;
-        }, 1800);
-      };
-    }
-  });
-  // Modern digital countdown (D:HH:MM:SS)
-  let seconds = countdownSeconds;
-  const digitalCountdown = document.getElementById('digital-countdown');
-  function pad(n) { return n.toString().padStart(2, '0'); }
-  function updateDigitalCountdown() {
-    if (seconds < 0) return;
-    const d = Math.floor(seconds / (3600*24));
-    const h = Math.floor((seconds % (3600*24)) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    let str = '';
-    if (d > 0) str += d + ':';
-    str += pad(h) + ':' + pad(m) + ':' + pad(s);
-    if (digitalCountdown) digitalCountdown.textContent = str;
-    seconds--;
-  }
-  updateDigitalCountdown();
-  setInterval(updateDigitalCountdown, 1000);
-</script>
-{% endif %} {% endblock %}
+    <style>
+@keyframes emoji-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.animate-emoji-bounce { animation: emoji-bounce 2s infinite; }
+@keyframes title-pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  80% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-title-pop { animation: title-pop 1s cubic-bezier(.4,0,.2,1) both; }
+@keyframes countdown-fade {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-countdown-fade { animation: countdown-fade 1s cubic-bezier(.4,0,.2,1) both; }
+.cheatday-pill { min-width: 90px; cursor: pointer; }
+.cheatday-pill[disabled] { cursor: not-allowed; }
+    </style>
+    <script>
+var isCheatDay = '{{ status.is_cheat_day|yesno:"true,false" }}';
+var countdownSeconds = {{ status.countdown_seconds|default:0|safe }};
+{% if status.is_cheat_day %}
+  var todayStr = '{{ status.next_cheat_day|date:"Y-m-d" }}';
+{% else %}
+  var todayStr = '';
+{% endif %}
+        const quotes = [
+          "Life is uncertain. Eat dessert first!",
+          "You can't live a full life on an empty stomach.",
+          "Stressed spelled backwards is desserts.",
+          "There is no sincerer love than the love of food.",
+          "Eat what you love. Love what you eat.",
+          "Food is the ingredient that binds us together.",
+          "Good food = Good mood!"
+        ];
+if (document.getElementById('cheat-quote')) {
+        document.getElementById('cheat-quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+}
+        const funFacts = [
+          "Did you know? The world’s largest pizza was over 13,000 square feet!",
+          "Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that’s still edible!",
+          "Apples float in water because they are 25% air.",
+          "The most expensive pizza in the world costs over $12,000 and takes 72 hours to make.",
+          "Carrots were originally purple in color.",
+          "Peanuts are not nuts—they’re legumes!",
+          "Bananas are berries, but strawberries aren’t.",
+          "A group of flamingos is called a 'flamboyance'.",
+          "The popsicle was invented by an 11-year-old by accident.",
+          "Tomatoes were once considered poisonous in Europe."
+        ];
+if (document.getElementById('fun-fact')) {
+        document.getElementById('fun-fact').textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
+}
+// Modern digital countdown (D:HH:MM:SS)
+let seconds = typeof countdownSeconds !== 'undefined' ? countdownSeconds : 0;
+const digitalCountdown = document.getElementById('digital-countdown');
+function pad(n) { return n.toString().padStart(2, '0'); }
+function updateDigitalCountdown() {
+  if (seconds < 0) return;
+  const d = Math.floor(seconds / (3600*24));
+  const h = Math.floor((seconds % (3600*24)) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  let str = '';
+  if (d > 0) str += d + ':';
+  str += pad(h) + ':' + pad(m) + ':' + pad(s);
+  if (digitalCountdown) digitalCountdown.textContent = str;
+  seconds--;
+}
+updateDigitalCountdown();
+setInterval(updateDigitalCountdown, 1000);
+    </script>
+{% endblock %}

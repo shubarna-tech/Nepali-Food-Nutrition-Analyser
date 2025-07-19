@@ -1,6 +1,6 @@
 from django import forms
-from .models import UserGoal
-from .models import WaterLog
+
+from .models import UserGoal, WaterLog
 
 
 class UserGoalForm(forms.ModelForm):
