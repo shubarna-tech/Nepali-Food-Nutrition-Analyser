@@ -175,23 +175,12 @@ See [`requirements.txt`](requirements.txt) for the full list.
 
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
 
 ## 🙏 Acknowledgements
 
 - TensorFlow.js
 - Django REST Framework
 - Tailwind CSS
-- Nepali and Indian food datasets
+- Nepali food datasets
 
 ---
-
-## 📬 Contact
-
-For questions or support, open an issue or contact the maintainer. 
